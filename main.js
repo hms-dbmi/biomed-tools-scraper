@@ -5,9 +5,12 @@ import fs from 'fs';
 
 // Configurable settings
 const params = {
-    HEADLESS : false, // Set to false for debugging
+    HEADLESS : true, // Set to false for debugging
     DELAY_MS : 3000, // Throttle delay (3 seconds)
-    MAX_CONCURRENT : 3 // Number of pages to open at a time
+    MAX_CONCURRENT : 3, // Number of pages to open at a time
+    COMBINED_CSV_PATH : 'outputs/combined.csv',
+    UNIQUE_CSV_PATH : 'outputs/uniques_by_url.csv',
+    PRIMARY_KEY_COLUMN : 3 // column 3 is the url
 }
 
 function mergeCSVFiles(inputFiles, outputFile) {
@@ -31,7 +34,7 @@ function mergeCSVFiles(inputFiles, outputFile) {
     console.log(`Merged CSV saved to ${outputFile}`);
 }
 
-const runScrapers = async function () {
+const runScrapers = async function ({COMBINED_CSV_PATH}) {
     try {
 
         // Run the scraper for genocat
@@ -43,22 +46,63 @@ const runScrapers = async function () {
         // run the scraper for awesome-biological-visualizations
         await scrapeAwesomeBiologicalVisualizations('outputs/awesome-biological-visualizations_results.csv', params);
 
-        // 'outputs/combined.csv'
+        // create the merged CSV
         mergeCSVFiles(
             [
                 'outputs/genocat_results.csv',
                 'outputs/awesome-tools-visualization_results.csv',
                 'outputs/awesome-biological-visualizations_results.csv'
             ],
-            'outputs/combined.csv'
+            COMBINED_CSV_PATH
         );
 
-        console.log("Scraping completed. Exiting...");
-        process.exit(0); // Ensures the script fully terminates
+        console.log("Scraping completed.");
     } catch (error) {
         console.error("Error during scraping:", error);
-        process.exit(1);
     }
 }
 
-runScrapers();
+const processCSV = function ({COMBINED_CSV_PATH, UNIQUE_CSV_PATH, PRIMARY_KEY_COLUMN}) {
+    const content = fs.readFileSync(COMBINED_CSV_PATH, 'utf8').trim();
+    const lines = content.split('\n');
+
+    if (lines.length < 2) {
+        console.error('CSV file is empty or has no data rows.');
+        return;
+    }
+
+    const header = lines[0]; // Extract header row
+    const rows = lines.slice(1); // Extract data rows
+
+    const seenFields = new Map(); // Map to track duplicates
+    let absoluteUniques = [];
+
+    rows.forEach(row => {
+        const columns = row.split(','); // Split row into columns
+        const key = columns[PRIMARY_KEY_COLUMN]?.trim().toLowerCase().replace("https://","").replace("http://","").replace("www.",""); // Normalize key field (e.g., External URL)
+
+        if (!key || key === "null" || key === '"null"') {
+            seenFields.set(columns[0]?.trim().toLowerCase(), row);
+        } else {
+            seenFields.set(key, row); // Always store the latest occurrence of the key
+        }
+    });
+
+    // Collect unique rows from the map
+    absoluteUniques = [...seenFields.values()];
+
+    // Sort by the first column (case-insensitive)
+    absoluteUniques.sort((a, b) => {
+        const nameA = a.split(',')[0]?.trim().toLowerCase();
+        const nameB = b.split(',')[0]?.trim().toLowerCase();
+        return nameA.localeCompare(nameB);
+    });
+
+    // Write the final absolute unique CSV
+    fs.writeFileSync(UNIQUE_CSV_PATH, [header, ...absoluteUniques].join('\n'), 'utf8');
+    console.log(`Absolute uniques saved to ${UNIQUE_CSV_PATH}`);
+}
+
+await runScrapers(params);
+
+processCSV(params);

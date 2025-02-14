@@ -2,6 +2,7 @@
 
 import { chromium } from '@playwright/test';
 import fs from 'fs';
+const source = "awesome-biological-visualizations";
 
 export const scrapeAwesomeBiologicalVisualizations = async function (OUTPUT_FILE, {HEADLESS,DELAY_MS,MAX_CONCURRENT}) {
     // Launch browser
@@ -12,9 +13,7 @@ export const scrapeAwesomeBiologicalVisualizations = async function (OUTPUT_FILE
     const page = await context.newPage();
 
     // Ensure CSV file starts with a header
-    // if (!fs.existsSync(OUTPUT_FILE)) { // only  if it doesn’t exist
-    fs.writeFileSync(OUTPUT_FILE, 'Name,Internal URL,External URL\n');
-    // }
+    fs.writeFileSync(OUTPUT_FILE, 'Name,Source,Internal URL,External URL\n');
 
     try {
         // Navigate to the website
@@ -39,20 +38,20 @@ export const scrapeAwesomeBiologicalVisualizations = async function (OUTPUT_FILE
         let toolsCSVString = "";
 
         tools.map( (tool,i) => {
-            toolsCSVString += `"${tool.name}","","${tool.url}"\n`;
+            toolsCSVString += `"${tool.name}","${source}","","${tool.url}"\n`;
         });
 
         
         try {
             fs.appendFileSync(OUTPUT_FILE, toolsCSVString);
         } catch (error) {
-            console.error(`❌ Failed to write to ${OUTPUT_FILE}:`, error);
+            console.error(`Failed to write to ${OUTPUT_FILE}:`, error);
         }
 
-        console.log(`✅ Data written to ${OUTPUT_FILE}`);
+        console.log(`Data written to ${OUTPUT_FILE}`);
 
     } catch (error) {
-        console.error('❌ An error occurred:', error);
+        console.error('An error occurred:', error);
     } finally {
         await browser.close();
     }

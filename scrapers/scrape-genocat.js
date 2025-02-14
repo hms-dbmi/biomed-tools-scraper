@@ -1,8 +1,8 @@
 // scrapes the genocat website (rate-limited) for web-based tools and creates a CSV with headings [ Name, Internal URL, External URL ]
 
 import { chromium, expect } from '@playwright/test';
-
 import fs from 'fs';
+const source = "genocat";
 
 export const scrapeGenocat = async function (OUTPUT_FILE, {HEADLESS,DELAY_MS,MAX_CONCURRENT}) {
     // Launch browser
@@ -13,9 +13,7 @@ export const scrapeGenocat = async function (OUTPUT_FILE, {HEADLESS,DELAY_MS,MAX
     const page = await context.newPage();
 
     // Ensure CSV file starts with a header
-    // if (!fs.existsSync(OUTPUT_FILE)) { // only  if it doesn’t exist
-    fs.writeFileSync(OUTPUT_FILE, 'Name,Internal URL,External URL\n');
-    // }
+    fs.writeFileSync(OUTPUT_FILE, 'Name,Source,Internal URL,External URL\n');
 
     try {
         // Navigate to the website
@@ -71,22 +69,22 @@ export const scrapeGenocat = async function (OUTPUT_FILE, {HEADLESS,DELAY_MS,MAX
                         return linkElement ? linkElement.href : 'N/A';
                     });
 
-                    console.log(`✅ ${item.name}: ${externalLink}`);
+                    console.log(`${item.name}: ${externalLink}`);
 
                     // Append result to CSV as we go
-                    fs.appendFileSync(OUTPUT_FILE, `"${item.name}","${item.internalUrl}","${externalLink}"\n`);
+                    fs.appendFileSync(OUTPUT_FILE, `"${item.name}","${source}","${item.internalUrl}","${externalLink}"\n`);
                 } catch (error) {
-                    console.error(`❌ Failed to fetch ${item.internalUrl}:`, error);
+                    console.error(`Failed to fetch ${item.internalUrl}:`, error);
                 } finally {
                     await toolPage.close();
                 }
             }));
         }
 
-        console.log(`✅ Data continuously written to ${OUTPUT_FILE}`);
+        console.log(`Data continuously written to ${OUTPUT_FILE}`);
 
     } catch (error) {
-        console.error('❌ An error occurred:', error);
+        console.error('An error occurred:', error);
     } finally {
         await browser.close();
     }
