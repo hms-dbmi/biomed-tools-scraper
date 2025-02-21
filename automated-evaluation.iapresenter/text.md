@@ -1,50 +1,3 @@
-# Scraper and Keyboard tester
-
-## Scraper
-
-Scrapes Genocat, Awesome-Tools-Visualization, and Awesome-Biological-Visualizations.
-
-### Setup
-
-```bash
-npm install
-````
-
-1. Update config in main.js
-
-2. Run the scraper:
-```
-node main.js
-```
-
-- Scrapes Genocat, Awesome-Tools-Visualization, and Awesome-Biological-Visualizations.
-- Collects tool `name`, `url`, `source`, and additional metadata
-- Generates CSV files in `outputs/` directory
-  - default :
-    - combined : `outputs/combined.csv`
-    - uniques (by URL) : `outputs/uniques_by_url.csv`
-
-
-Finally, `outputs/uniques_by_url.csv` is duplicated into `outputs/uniques_by_url_manually_pruned.csv`, which is manually cleaned (TODO).
-
-## Keyboard tester
-
-```
-node keyboard-test.js
-```
-
-## Notebook for data analysis (optional)
-
-### Setup Jupyter notebook
-
-```
-pip install jupyterlab
-npm install -g ijavascript
-ijsinstall
-jupyter lab
-```
-
-
 ## Automated evaluation
 
 ### 1.
@@ -240,3 +193,8 @@ filter: darken
 	- `skip-link`
 		- "Ensure all skip links have a focusable target"
 
+---
+
+### Next: 
+	- Manually check URLs to ensure they are all pointing to data apps and not their landing pages
+	- Graph ranges and averages

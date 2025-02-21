@@ -1,0 +1,45 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Violation Histogram</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <canvas id="violationHistogram" width="400" height="200"></canvas>
+    <script>
+        const ctx = document.getElementById('violationHistogram').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [0,1,2],
+                datasets: [{
+                    label: 'Number of URLs',
+                    data: [34,104,11],
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Number of Violations'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Number of URLs'
+                        },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

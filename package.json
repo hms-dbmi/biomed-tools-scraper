@@ -1,10 +1,13 @@
 {
   "name": "scraper",
-  "type": "module", 
+  "type": "module",
   "version": "1.0.0",
   "description": "",
   "main": "scrape-genocat.js",
-  "dependencies": {},
+  "dependencies": {
+    "@axe-core/playwright": "^4.10.1",
+    "csv-parser": "^3.2.0"
+  },
   "devDependencies": {
     "@playwright/test": "^1.50.1"
   },
