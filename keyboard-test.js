@@ -4,8 +4,9 @@ import { AxeBuilder } from '@axe-core/playwright';
 import csv from 'csv-parser';
 
 const params = {
-  filePath : './outputs/uniques_by_url.csv',
-  columnName : 'External URL'
+  // filePath : './outputs/uniques_by_url.csv',
+  filePath: './analysis/To Find Data App URLs - uniques_by_url_manually_pruned.csv',
+  urlColumn : 'Data App URL'
 }
 
 const urls = await new Promise((resolve, reject) => {
@@ -14,9 +15,12 @@ const urls = await new Promise((resolve, reject) => {
   .pipe(csv())
   .on('data', (data) => {
     // console.log(data);
-    const columnData = data[params.columnName];
+    const columnData = { 
+      'name' : data["Name"], 
+      'url' : data[params.urlColumn]
+    };
 
-    switch (columnData) {
+    switch (columnData.url) {
       case 'null':
         break;
       default:
@@ -29,7 +33,8 @@ const urls = await new Promise((resolve, reject) => {
     resolve(results);
   })
   .on('error', (error) => {
-      console.error('Error reading CSV file:', error);
+    console.error('Error reading CSV file:', error);
+    reject(error);
   });
 })
 
@@ -51,40 +56,81 @@ const urls = await new Promise((resolve, reject) => {
 // ];
 
 const assessUrls = async (urls) => {
-    const browser = await chromium.launch({headless: false});
+  const browser = await chromium.launch({headless: false});
+
+  for (const {url, name} of urls) {
+
+    if(!url || url=="n/a"){
+      continue;
+    }
+
     const context = await browser.newContext();
     const page = await context.newPage();
-  let results = [];
 
-  for (const url of urls) {
     try {
       console.log(`Testing: ${url}`);
-      await page.goto(url, { waitUntil: 'load' });
-  
-      // Run axe-core analysis and filter keyboard-related issues
-      const axe = new AxeBuilder({ page });
-      const axeResults = await axe.analyze();
       
-      const keyboardViolations = axeResults.violations.filter(v => 
-        v.tags.includes('cat.keyboard') // only the issues tagged cat.keyboard
-      );
+      try {
+        await page.goto(url, { waitUntil: 'networkidle', timeout: 60000 });
+      } catch (navigationError) {
+        console.error(`Error navigating to URL ${url}:`, navigationError);
+        continue; // Skip to the next URL on failure
+      }
   
-      results.push({ 
-        url, 
-        violations: keyboardViolations
-      });
-  
+      // Run axe-core analysis
+      try {
+        await runAxeCoreAnalysis(page, name, url);
+      } catch (analysisError) {
+        console.error('Error during Axe analysis:', analysisError);
+      }
+      
       console.log(`Finished testing: ${url}`);
     } catch (error) {
-      console.error(error);
+      console.error('Unexpected error while testing the URL:', error);
+    } finally {
+      await page.close(); // Close the page after finishing
+      await context.close(); // Close the context to clean up
     }
   }
-
-  fs.writeFileSync('outputs/keyboard-accessibility-results.json', JSON.stringify(results, null, 2));
-
-  console.log('Results saved to keyboard-accessibility-results.json');
   await browser.close();
 };
 
+const runAxeCoreAnalysis = async (page, name, url) => {
+  // let results = [];
 
-assessUrls(urls)
+  // console.log("running axe-core analysis");
+        
+  const axe = new AxeBuilder({ page });
+  // const axeResults = await axe.analyze();
+  const axeResults = await withTimeout(axe.analyze(), 30000); // 30 seconds timeout
+  // const keyboardViolations = axeResults.violations.filter(v => 
+  //   v.tags.includes('cat.keyboard')
+  // );
+
+  if(!axeResults){
+    throw new error("axe.analyze() timeout");
+  }
+
+  const result = { 
+    name,
+    url, 
+    // keyboardViolations,
+    axeResults
+  };
+
+  fs.appendFileSync('outputs/keyboard-accessibility-results.json', JSON.stringify(result, null, 2));
+
+  console.log('Results saved to keyboard-accessibility-results.json');
+}
+
+// Utility function to add timeout to any promise
+const withTimeout = (promise, time, timeoutError = new Error('Operation timed out')) => {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(timeoutError), time))
+  ]);
+};
+
+fs.writeFileSync('outputs/keyboard-accessibility-results.json', "[");
+assessUrls(urls);
+fs.appendFileSync('outputs/keyboard-accessibility-results.json', "]");

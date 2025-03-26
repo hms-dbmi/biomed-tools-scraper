@@ -8,12 +8,13 @@ Scrapes Genocat, Awesome-Tools-Visualization, and Awesome-Biological-Visualizati
 
 ```bash
 npm install
-````
+```
 
 1. Update config in main.js
 
 2. Run the scraper:
-```
+
+```bash
 node main.js
 ```
 

@@ -1,7 +1,7 @@
 ## Automated evaluation
 
 ### 1.
-	Scrape: `genocat`, `awesome-biological-visualizations`, and `awesome-tools-visualization` for web-based data visualization tools
+	Scrape: `genocat`, `awesome-biological-visualizations`, and `awesome-genome-visualization` for web-based data visualization tools
 ### 2.
 	- Save web links to combined CSV
 	- Clean the combined CSV
