@@ -118,7 +118,7 @@ const runAxeCoreAnalysis = async (page, name, url) => {
     axeResults
   };
 
-  fs.appendFileSync('outputs/keyboard-accessibility-results.json', JSON.stringify(result, null, 2));
+  fs.appendFileSync('outputs/keyboard-accessibility-results.json', ""+JSON.stringify(result, null, 2)+",");
 
   console.log('Results saved to keyboard-accessibility-results.json');
 }
