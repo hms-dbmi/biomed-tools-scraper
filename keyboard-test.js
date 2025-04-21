@@ -6,14 +6,22 @@ import csv from 'csv-parser';
 const params = {
   // filePath : './outputs/uniques_by_url.csv',
   filePath: './analysis/To Find Data App URLs - uniques_by_url_manually_pruned.csv',
-  urlColumn : 'Data App URL'
+  urlColumn : 'Data App URL',
+  startAt : 0
 }
 
 const urls = await new Promise((resolve, reject) => {
   const results = [];
+  let i = 1;
   fs.createReadStream(params.filePath)
   .pipe(csv())
   .on('data', (data) => {
+    i++;
+    if(i < params.startAt){
+      // console.log("" + i + "<" + params.startAt);
+      return;
+    }
+    console.log("" + i + ": " + data["Name"]);
     // console.log(data);
     const columnData = { 
       'name' : data["Name"], 
@@ -108,7 +116,7 @@ const runAxeCoreAnalysis = async (page, name, url) => {
   // );
 
   if(!axeResults){
-    throw new error("axe.analyze() timeout");
+    throw new Error("axe.analyze() timeout");
   }
 
   const result = { 
@@ -117,6 +125,10 @@ const runAxeCoreAnalysis = async (page, name, url) => {
     // keyboardViolations,
     axeResults
   };
+
+  axeResults.inapplicable && delete axeResults.inapplicable;
+  axeResults.passes && delete axeResults.passes;
+  axeResults.incomplete && delete axeResults.incomplete;
 
   fs.appendFileSync('outputs/keyboard-accessibility-results.json', ""+JSON.stringify(result, null, 2)+",");
 
@@ -131,6 +143,6 @@ const withTimeout = (promise, time, timeoutError = new Error('Operation timed ou
   ]);
 };
 
-fs.writeFileSync('outputs/keyboard-accessibility-results.json', "[");
+// fs.writeFileSync('outputs/keyboard-accessibility-results.json', "[");
 assessUrls(urls);
-fs.appendFileSync('outputs/keyboard-accessibility-results.json', "]");
+// fs.appendFileSync('outputs/keyboard-accessibility-results.json', "]");

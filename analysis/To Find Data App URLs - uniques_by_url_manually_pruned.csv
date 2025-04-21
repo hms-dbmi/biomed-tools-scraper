@@ -317,3 +317,7 @@ ID,Name,Source,Landing Page,Data App URL,Notes why app URL chosen,"If n/a, why?"
 316,wasm bigwig demo browser,awesome-genome-visualization,https://shk656461.github.io/index.html,https://shk656461.github.io/index.html,,,FALSE,Sehi,,No,
 317,WebLogo,genocat,https://weblogo.berkeley.edu/logo.cgi,https://weblogo.berkeley.edu/logo.cgi,,,FALSE,Sehi,This is a configuration page before the visualization step,Yes,
 318,Zenbu,awesome-genome-visualization,http://fantom.gsc.riken.jp/zenbu/,https://fantom.gsc.riken.jp/zenbu/gLyphs/#config=FANTOM5_promoterome_hg38,,,FALSE,Sehi,It took some time to load the entire visualization. I wonder if axe can evaluate after all of them are loaded.,No,
+319,GEO,Sehi,https://www.ncbi.nlm.nih.gov/geo/,https://www.ncbi.nlm.nih.gov/geo/geo2r/?acc=GSE10072,Found via ChatGPT,,,,,,
+320,ENCODE,Sehi,https://www.encodeproject.org/,https://www.encodeproject.org/matrix/?type=Experiment&control_type!=*&status=released&perturbed=false,First example,,,,,,
+321,Cytoscape,HIDIVE,https://js.cytoscape.org,https://js.cytoscape.org/demos/fcose-gene/,First example,,,Lawrence Weru,,,
+322,Chromoscope,HIDIVE,https://chromoscope.bio,https://chromoscope.bio/app/,First example,,,Lawrence Weru,,,
