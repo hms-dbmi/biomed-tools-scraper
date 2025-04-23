@@ -1,4 +1,4 @@
 node_modules
 .ipynb_checkpoints
-outputs/keyboard-accessibility-results.json
+# outputs/keyboard-accessibility-results.json
 outputs/keyboard-accessibility-results (original).json
