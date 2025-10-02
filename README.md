@@ -2,7 +2,7 @@
 
 ## Scraper
 
-Scrapes Genocat, Awesome-Genome-Visualization, and Awesome-Biological-Visualizations.
+Scrapes Genocat, Awesome-Tools-Visualization, and Awesome-Biological-Visualizations.
 
 ### Setup
 
@@ -18,7 +18,7 @@ npm install
 node main.js
 ```
 
-- Scrapes Genocat, Awesome-Genome-Visualization, and Awesome-Biological-Visualizations.
+- Scrapes Genocat, Awesome-Tools-Visualization, and Awesome-Biological-Visualizations.
 - Collects tool `name`, `url`, `source`, and additional metadata
 - Generates CSV files in `outputs/` directory
   - default :
@@ -49,7 +49,7 @@ jupyter lab
 ## Automated evaluation
 
 ### 1.
-	Scrape: `genocat`, `awesome-biological-visualizations`, and `awesome-genome-visualization` for web-based data visualization tools
+	Scrape: `genocat`, `awesome-biological-visualizations`, and `awesome-tools-visualization` for web-based data visualization tools
 ### 2.
 	- Save web links to combined CSV
 	- Clean the combined CSV

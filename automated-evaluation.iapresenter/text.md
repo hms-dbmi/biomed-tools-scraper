@@ -1,12 +1,12 @@
 ## Automated evaluation
 
-### 1.
-	Scrape: `genocat`, `awesome-biological-visualizations`, and `awesome-genome-visualization` for web-based data visualization tools
-### 2.
-	- Save web links to combined CSV
-	- Clean the combined CSV
-### 3.
-	 - For each URL, run an automated accessibility checker, such as AXE.
+	1. 
+		- Scrape: `genocat`, `awesome-biological-visualizations`, and `awesome-genome-visualization` for web-based data visualization tools
+	 2. 
+		- Save web links to combined CSV
+		- Clean the combined CSV
+	3.
+		- For each URL, run an automated accessibility checker, such as AXE.
 
 ---
 
@@ -43,26 +43,35 @@ scraper % tree .
 ```
 
 ---
-
-### Scrapers
+### Scraper code
 	```
 	root
+	├── ...
 	├── main.js
+	├── ...
 	└── scrapers
 	    ├── scrape-awesome-biological-visualizations.js
 	    ├── scrape-awesome-tools-visualization.js
 	    └── scrape-genocat.js
 	```
+
+---
+### Run Scrapers
 	```
 	$ node main.js
 	```
 
-### Saved data
+---
+### Scraped data
 	```
 	root
 	└── outputs
-	    ├── [DATASource].csv
-	    └── ...
+	│   ├── awesome-biological-visualizations_results.csv
+	│   ├── awesome-tools-visualization_results.csv
+	│   ├── ...
+	│   ├── genocat_results.csv
+	│   └── ...
+	└── ...
 	```
 
 ---
@@ -80,8 +89,32 @@ Name,Source,Internal URL,External URL
 ...
 ```
 
----
 
+---
+### Cleaned data
+	```
+	root
+	└── outputs
+	│   ├── combined.csv
+	│   ├── uniques_by_url.csv
+	│   ├── uniques_by_url_manually_pruned.csv
+	│   └── ...
+	└── ...
+	```
+
+---
+### Data cleaning outputs
+	```
+	   awesome-biological-visualizations_results.csv 
+	 + awesome-tools-visualization_results.csv       
+	 + genocat_results.csv                           
+	 ──────────────────────────────────────────────────
+	 = combined.csv 
+		└──> uniques_by_url.csv
+				└──> uniques_by_url_manually_pruned.csv
+	```
+
+---
 ### Keyboard accessibility measurements
 	```
 	root
@@ -99,7 +132,6 @@ Name,Source,Internal URL,External URL
 	```
 
 ---
-
 ### Output (Axe)
 ```
 [
