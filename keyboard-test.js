@@ -5,7 +5,7 @@ import csv from 'csv-parser';
 
 const params = {
   // filePath : './outputs/uniques_by_url.csv',
-  filePath: './analysis/To Find Data App URLs - uniques_by_url_manually_pruned.csv',
+  filePath: './analysis/app_urls.csv',
   urlColumn : 'Data App URL'
 }
 
