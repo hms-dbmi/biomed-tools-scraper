@@ -7,60 +7,69 @@ const DATA_FOLDER = './data/scrapers';
 const OUTPUT_FOLDER = './data/axe';
 const FILE_PATH = `${DATA_FOLDER}/app-urls.csv`;
 const URL_COLUMN = 'Data App URL';
+const OUTPUT_FILE = 'keyboard-accessibility-results-1.json'
+const LOG_FILE = 'log.txt'
 
 
+// logging messages and errors
+fs.writeFileSync(`${OUTPUT_FOLDER}/${LOG_FILE}`, "");
+
+const log = (message) => {
+  console.log(message);
+  fs.appendFileSync(`${OUTPUT_FOLDER}/${LOG_FILE}`, `[${new Date().toISOString()}] LOG: ${message}\n`);
+};
+
+const logError = (message, error) => {
+  if (message) {
+    fs.appendFileSync(`${OUTPUT_FOLDER}/${LOG_FILE}`, `[${new Date().toISOString()}] ERROR: ${message}\n`);
+  }
+  if (error) {
+    fs.appendFileSync(`${OUTPUT_FOLDER}/${LOG_FILE}`, `[${new Date().toISOString()}] ${error.stack || error}\n`);
+  }
+};
+
+
+// retrieving tool URLs
 const urls = await new Promise((resolve, reject) => {
+  log("Start")
   const results = [];
   fs.createReadStream(FILE_PATH)
-  .pipe(csv())
-  .on('data', (data) => {
-    // console.log(data);
-    const columnData = { 
-      'name' : data["Name"], 
-      'url' : data[URL_COLUMN]
-    };
+    .pipe(csv())
+    .on('data', (data) => {
+      const columnData = { 
+        'name' : data["Name"], 
+        'url' : data[URL_COLUMN]
+      };
 
-    switch (columnData.url) {
-      case 'null':
-        break;
-      default:
-        results.push(columnData)
-        break;
-    }
-  })
-  .on('end', () => {
-    // console.log(results);
-    resolve(results);
-  })
-  .on('error', (error) => {
-    console.error('Error reading CSV file:', error);
-    reject(error);
-  });
+      switch (columnData.url) {
+        case 'null':
+          break;
+        default:
+          results.push(columnData)
+          break;
+      }
+    })
+    .on('end', () => {
+      resolve(results);
+      log(`Number of tools: ${results.length}`)
+    })
+    .on('error', (error) => {
+      logError('Error reading CSV file', error)
+      reject(error);
+    });
 })
 
-// console.log(results);
 
+const results = []; 
 
-
-// process.exit();
-
-
-// // List of URLs to scan
-// const urls = [
-//   'https://example.com',
-//   'http://3dgb.cs.mcgill.ca/',
-//   'http://bioinfo.au.tsinghua.edu.cn/member/nadhir/HiC3DViewer/',
-//   'http://www.bioinformatics.org/strap/aa',
-//   'https://github.com/ihh/abrowse',
-//   'http://www.abrowse.org/',
-// ];
 
 const assessUrls = async (urls) => {
-  const browser = await chromium.launch({headless: false});
+  const browser = await chromium.launch({headless: true});
 
   for (const {url, name} of urls) {
 
-    if(!url || url=="n/a"){
+    if (!url || url=="n/a"){
+      logError(`Tool ${name} - No URL`, false)
       continue;
     }
 
@@ -68,25 +77,23 @@ const assessUrls = async (urls) => {
     const page = await context.newPage();
 
     try {
-      console.log(`Testing: ${url}`);
-      
+      // Navigate to page
       try {
         await page.goto(url, { waitUntil: 'networkidle', timeout: 60000 });
       } catch (navigationError) {
-        console.error(`Error navigating to URL ${url}:`, navigationError);
-        continue; // Skip to the next URL on failure
+        logError(`Tool ${name} - Navigation Error`, false);
+        continue;
       }
   
       // Run axe-core analysis
       try {
         await runAxeCoreAnalysis(page, name, url);
       } catch (analysisError) {
-        console.error('Error during Axe analysis:', analysisError);
+        logError(`Tool ${name} - Axe Time-Out`, analysisError);
       }
       
-      console.log(`Finished testing: ${url}`);
     } catch (error) {
-      console.error('Unexpected error while testing the URL:', error);
+      logError(`Tool ${name} - Unexpected Error`, error);
     } finally {
       await page.close(); // Close the page after finishing
       await context.close(); // Close the context to clean up
@@ -95,42 +102,34 @@ const assessUrls = async (urls) => {
   await browser.close();
 };
 
-const runAxeCoreAnalysis = async (page, name, url) => {
-  // let results = [];
-
-  // console.log("running axe-core analysis");
-        
+const runAxeCoreAnalysis = async (page, name, url) => {  
   const axe = new AxeBuilder({ page });
   // const axeResults = await axe.analyze();
   const axeResults = await withTimeout(axe.analyze(), 30000); // 30 seconds timeout
-  // const keyboardViolations = axeResults.violations.filter(v => 
-  //   v.tags.includes('cat.keyboard')
-  // );
 
-  if(!axeResults){
+  if (!axeResults){
     throw new error("axe.analyze() timeout");
   }
 
   const result = { 
     name,
     url, 
-    // keyboardViolations,
     axeResults
   };
 
-  fs.appendFileSync(`${OUTPUT_FOLDER}/keyboard-accessibility-results.json`, ""+JSON.stringify(result, null, 2)+",");
-
-  console.log('Results saved to keyboard-accessibility-results.json');
+  results.push(result);
 }
 
 // Utility function to add timeout to any promise
 const withTimeout = (promise, time, timeoutError = new Error('Operation timed out')) => {
+  let timer;
   return Promise.race([
-    promise,
-    new Promise((_, reject) => setTimeout(() => reject(timeoutError), time))
+    promise.finally(() => clearTimeout(timer)),
+    new Promise((_, reject) => {
+      timer = setTimeout(() => reject(timeoutError), time);
+    })
   ]);
 };
 
-fs.writeFileSync(`${OUTPUT_FOLDER}/keyboard-accessibility-results.json`, "[");
-assessUrls(urls);
-fs.appendFileSync(`${OUTPUT_FOLDER}/keyboard-accessibility-results.json`, "]");
+await assessUrls(urls);
+fs.writeFileSync(`${OUTPUT_FOLDER}/${OUTPUT_FILE}`, JSON.stringify(results, null, 2));
