@@ -69,8 +69,6 @@ export const scrapeGenocat = async function (OUTPUT_FILE, {HEADLESS,DELAY_MS,MAX
                         return linkElement ? linkElement.href : 'N/A';
                     });
 
-                    console.log(`${item.name}: ${externalLink}`);
-
                     // Append result to CSV as we go
                     fs.appendFileSync(OUTPUT_FILE, `"${item.name}","${source}","${item.internalUrl}","${externalLink}"\n`);
                 } catch (error) {

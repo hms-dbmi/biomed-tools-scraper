@@ -9,7 +9,7 @@ const DATA_FOLDER = './data/scrapers';
 const params = {
     HEADLESS : true, // Set to false for debugging
     DELAY_MS : 3000, // Throttle delay (3 seconds)
-    MAX_CONCURRENT : 3, // Number of pages to open at a time
+    MAX_CONCURRENT : 10, // Number of pages to open at a time
     COMBINED_CSV_PATH :`${DATA_FOLDER}/combined.csv`,
     UNIQUE_CSV_PATH : `${DATA_FOLDER}/uniques_by_url.csv`,
     PRIMARY_KEY_COLUMN : 3 // column 3 is the url
@@ -39,15 +39,13 @@ function mergeCSVFiles(inputFiles, outputFile) {
 const runScrapers = async function ({COMBINED_CSV_PATH}) {
     try {
 
-        // Run the scraper for genocat
-        await scrapeGenocat(`${DATA_FOLDER}/genocat_results.csv`, params); 
-
-        // run the scraper for awesome-tools-visualization
-        await scrapeAwesomeToolsVisualization(`${DATA_FOLDER}/awesome-tools-visualization_results.csv`, params);
-
-        // run the scraper for awesome-biological-visualizations
-        await scrapeAwesomeBiologicalVisualizations(`${DATA_FOLDER}/awesome-biological-visualizations_results.csv`, params);
-
+        // run scrapers
+        await Promise.all([
+            scrapeGenocat(`${DATA_FOLDER}/genocat_results.csv`, params),
+            scrapeAwesomeToolsVisualization(`${DATA_FOLDER}/awesome-tools-visualization_results.csv`, params),
+            scrapeAwesomeBiologicalVisualizations(`${DATA_FOLDER}/awesome-biological-visualizations_results.csv`, params)
+        ]);
+        
         // create the merged CSV
         mergeCSVFiles(
             [
