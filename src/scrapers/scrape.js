@@ -1,15 +1,17 @@
-import { scrapeGenocat } from "./scrapers/scrape-genocat.js";
-import { scrapeAwesomeToolsVisualization } from "./scrapers/scrape-awesome-tools-visualization.js";
-import { scrapeAwesomeBiologicalVisualizations } from "./scrapers/scrape-awesome-biological-visualizations.js";
+import { scrapeGenocat } from "./scrape-genocat.js";
+import { scrapeAwesomeToolsVisualization } from "./scrape-awesome-tools-visualization.js";
+import { scrapeAwesomeBiologicalVisualizations } from "./scrape-awesome-biological-visualizations.js";
 import fs from 'fs';
 
 // Configurable settings
+const DATA_FOLDER = './data/scrapers';
+
 const params = {
     HEADLESS : true, // Set to false for debugging
     DELAY_MS : 3000, // Throttle delay (3 seconds)
     MAX_CONCURRENT : 3, // Number of pages to open at a time
-    COMBINED_CSV_PATH : 'outputs/combined.csv',
-    UNIQUE_CSV_PATH : 'outputs/uniques_by_url.csv',
+    COMBINED_CSV_PATH :`${DATA_FOLDER}/combined.csv`,
+    UNIQUE_CSV_PATH : `${DATA_FOLDER}/uniques_by_url.csv`,
     PRIMARY_KEY_COLUMN : 3 // column 3 is the url
 }
 
@@ -38,20 +40,20 @@ const runScrapers = async function ({COMBINED_CSV_PATH}) {
     try {
 
         // Run the scraper for genocat
-        await scrapeGenocat('outputs/genocat_results.csv', params); 
+        await scrapeGenocat(`${DATA_FOLDER}/genocat_results.csv`, params); 
 
         // run the scraper for awesome-tools-visualization
-        await scrapeAwesomeToolsVisualization('outputs/awesome-tools-visualization_results.csv', params);
+        await scrapeAwesomeToolsVisualization(`${DATA_FOLDER}/awesome-tools-visualization_results.csv`, params);
 
         // run the scraper for awesome-biological-visualizations
-        await scrapeAwesomeBiologicalVisualizations('outputs/awesome-biological-visualizations_results.csv', params);
+        await scrapeAwesomeBiologicalVisualizations(`${DATA_FOLDER}/awesome-biological-visualizations_results.csv`, params);
 
         // create the merged CSV
         mergeCSVFiles(
             [
-                'outputs/genocat_results.csv',
-                'outputs/awesome-tools-visualization_results.csv',
-                'outputs/awesome-biological-visualizations_results.csv'
+                `${DATA_FOLDER}/genocat_results.csv`,
+                `${DATA_FOLDER}/awesome-tools-visualization_results.csv`,
+                `${DATA_FOLDER}/awesome-biological-visualizations_results.csv`
             ],
             COMBINED_CSV_PATH
         );

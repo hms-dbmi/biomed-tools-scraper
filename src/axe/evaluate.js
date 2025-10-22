@@ -3,21 +3,21 @@ import { chromium } from '@playwright/test';
 import { AxeBuilder } from '@axe-core/playwright';
 import csv from 'csv-parser';
 
-const params = {
-  // filePath : './outputs/uniques_by_url.csv',
-  filePath: './analysis/app_urls.csv',
-  urlColumn : 'Data App URL'
-}
+const DATA_FOLDER = './data/scrapers';
+const OUTPUT_FOLDER = './data/axe';
+const FILE_PATH = `${DATA_FOLDER}/app-urls.csv`;
+const URL_COLUMN = 'Data App URL';
+
 
 const urls = await new Promise((resolve, reject) => {
   const results = [];
-  fs.createReadStream(params.filePath)
+  fs.createReadStream(FILE_PATH)
   .pipe(csv())
   .on('data', (data) => {
     // console.log(data);
     const columnData = { 
       'name' : data["Name"], 
-      'url' : data[params.urlColumn]
+      'url' : data[URL_COLUMN]
     };
 
     switch (columnData.url) {
@@ -118,7 +118,7 @@ const runAxeCoreAnalysis = async (page, name, url) => {
     axeResults
   };
 
-  fs.appendFileSync('outputs/keyboard-accessibility-results.json', ""+JSON.stringify(result, null, 2)+",");
+  fs.appendFileSync(`${OUTPUT_FOLDER}/keyboard-accessibility-results.json`, ""+JSON.stringify(result, null, 2)+",");
 
   console.log('Results saved to keyboard-accessibility-results.json');
 }
@@ -131,6 +131,6 @@ const withTimeout = (promise, time, timeoutError = new Error('Operation timed ou
   ]);
 };
 
-fs.writeFileSync('outputs/keyboard-accessibility-results.json', "[");
+fs.writeFileSync(`${OUTPUT_FOLDER}/keyboard-accessibility-results.json`, "[");
 assessUrls(urls);
-fs.appendFileSync('outputs/keyboard-accessibility-results.json', "]");
+fs.appendFileSync(`${OUTPUT_FOLDER}/keyboard-accessibility-results.json`, "]");
