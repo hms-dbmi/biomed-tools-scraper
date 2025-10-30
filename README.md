@@ -1,6 +1,6 @@
 # Keyboard Accessibility Evaluation
-This repository contains a keyboard accessibility evaluation for visualization tools. It contains scripts and notebooks to retrieve app urls for three visualization repositories ([GenoCAT](https://genocat.tools), [awesome-genome-visualization](https://cmdcolin.github.io/awesome-genome-visualization/), and [awesome-biological-visualizations](https://github.com/keller-mark/awesome-biological-visualizations)), retrieve AXE accessibility reports for each resource, and analyze these results.
 
+This repository contains a keyboard accessibility evaluation for visualization tools. It contains scripts and notebooks to retrieve app urls for three visualization repositories ([GenoCAT](https://genocat.tools), [awesome-genome-visualization](https://cmdcolin.github.io/awesome-genome-visualization/), and [awesome-biological-visualizations](https://github.com/keller-mark/awesome-biological-visualizations)), retrieve AXE accessibility reports for each resource, and analyze these results.
 
 ## Setup
 
@@ -29,9 +29,10 @@ ijsinstall
 jupyter lab
 ```
 
-
 ## Team
-This project is part of the [HIDIVE Lab](https://hidivelab.org). 
+
+This project is part of the [HIDIVE Lab](https://hidivelab.org).
+
 - Lawrence Weru
 - Sehi L'Yi
 - Thomas Smits
