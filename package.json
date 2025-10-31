@@ -19,8 +19,8 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "lint:fix": "eslint ./src --fix",
-    "format": "prettier --write ."
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write ./src"
   },
   "keywords": [],
   "author": "",
